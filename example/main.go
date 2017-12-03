@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
-	solsha3 "github.com/miguelmota/go-solidity-sha3"
+	"github.com/miguelmota/go-solidity-sha3"
 )
 
 func main() {

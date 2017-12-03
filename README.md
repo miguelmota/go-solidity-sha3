@@ -1,6 +1,6 @@
 # go-solidity-sha3
 
-> Generate Solidity SHA3 hashes in Go.
+> Generate Solidity SHA3 (Keccak256) hashes in Go.
 
 <!--
 var a = new BN("0x12459c951127e0c374ff9105dda097662a027093", 16)
@@ -37,9 +37,11 @@ func main() {
     solsha3.Bool(true),
   )
 
-  fmt.Println(hex.EncodeToString(hash)()
+  fmt.Println(hex.EncodeToString(hash))
 }
 ```
+
+This package is the Go equivalent of `require('ethereumjs-abi').soliditySHA3` in node.
 
 # License
 

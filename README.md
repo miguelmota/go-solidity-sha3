@@ -23,9 +23,9 @@ var s4 = abi.soliditySHA3(['address', 'uint256'], [a, new BN('200000000000000', 
 package main
 
 import (
-  solsha3 "github.com/miguelmota/go-solidity-sha3"
-  "encoding/hex"
-  "fmt"
+	"encoding/hex"
+	"fmt"
+	"github.com/miguelmota/go-solidity-sha3"
 )
 
 func main() {
@@ -40,6 +40,14 @@ func main() {
   fmt.Println(hex.EncodeToString(hash))
 }
 ```
+
+Output
+
+```bash
+417a4c44724701ba79bb363151dff48909bc058a2c75a81e9cf5208ae4699369
+```
+
+---
 
 This package is the Go equivalent of `require('ethereumjs-abi').soliditySHA3` [NPM module](https://www.npmjs.com/package/ethereumjs-abi).
 

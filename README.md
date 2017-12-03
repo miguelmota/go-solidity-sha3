@@ -41,7 +41,7 @@ func main() {
 }
 ```
 
-This package is the Go equivalent of `require('ethereumjs-abi').soliditySHA3` in node.
+This package is the Go equivalent of `require('ethereumjs-abi').soliditySHA3` in [NPM package](https://www.npmjs.com/package/ethereumjs-abi).
 
 # License
 

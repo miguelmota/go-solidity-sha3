@@ -1,4 +1,4 @@
-package main
+package solsha3
 
 import (
 	"github.com/ethereum/go-ethereum/accounts/abi"

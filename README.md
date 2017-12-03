@@ -2,6 +2,8 @@
 
 > Generate Solidity SHA3 (Keccak256) hashes in Go.
 
+This package is the Go equivalent of `require('ethereumjs-abi').soliditySHA3` [NPM module](https://www.npmjs.com/package/ethereumjs-abi).
+
 <!--
 var a = new BN("0x12459c951127e0c374ff9105dda097662a027093", 16)
 
@@ -48,10 +50,6 @@ Output
 ```bash
 417a4c44724701ba79bb363151dff48909bc058a2c75a81e9cf5208ae4699369
 ```
-
----
-
-This package is the Go equivalent of `require('ethereumjs-abi').soliditySHA3` [NPM module](https://www.npmjs.com/package/ethereumjs-abi).
 
 # License
 

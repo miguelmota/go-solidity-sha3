@@ -19,6 +19,8 @@ var s4 = abi.soliditySHA3(['address', 'uint256'], [a, new BN('200000000000000', 
 
 # Usage
 
+Simple example
+
 ```go
 package main
 

@@ -12,9 +12,9 @@ Simple example
 package main
 
 import (
-	"encoding/hex"
-	"fmt"
-	"github.com/miguelmota/go-solidity-sha3"
+  "encoding/hex"
+  "fmt"
+  "github.com/miguelmota/go-solidity-sha3"
   "math/big"
 )
 

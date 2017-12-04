@@ -1,6 +1,8 @@
 package solsha3
 
 import (
+	"bytes"
+	"encoding/binary"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto/sha3"
@@ -11,16 +13,72 @@ func Address(addr string) []byte {
 	return common.HexToAddress(addr).Bytes()[:]
 }
 
-func Uint256(n int64) []byte {
-	return abi.U256(big.NewInt(n))
+func Uint256(n *big.Int) []byte {
+	return abi.U256(n)
 }
 
-/*
-func Uint32(n uint64) []byte {
-	r := abi.U256(new(big.Int).SetUint64(n))
-	return r
+func Uint128(n *big.Int) []byte {
+	return common.LeftPadBytes(n.Bytes(), 16)
 }
-*/
+
+func Uint64(n uint64) []byte {
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.BigEndian, n)
+	return buf.Bytes()
+}
+
+func Uint32(n uint32) []byte {
+	b := new(bytes.Buffer)
+	binary.Write(b, binary.BigEndian, n)
+	return b.Bytes()
+}
+
+func Uint16(n uint16) []byte {
+	b := new(bytes.Buffer)
+	binary.Write(b, binary.BigEndian, n)
+	return b.Bytes()
+}
+
+func Uint8(n uint8) []byte {
+	b := new(bytes.Buffer)
+	binary.Write(b, binary.BigEndian, n)
+	return b.Bytes()
+}
+
+func Int256(n *big.Int) []byte {
+	return common.LeftPadBytes(n.Bytes(), 32)
+}
+
+func Int128(n *big.Int) []byte {
+	return common.LeftPadBytes(n.Bytes(), 16)
+}
+
+func Int64(n int64) []byte {
+	i := uint64(n)
+	b := make([]byte, 8)
+	binary.BigEndian.PutUint64(b, i)
+	return b
+}
+
+func Int32(n int32) []byte {
+	i := uint32(n)
+	b := make([]byte, 4)
+	binary.BigEndian.PutUint32(b, i)
+	return b
+}
+
+func Int16(n int16) []byte {
+	i := uint16(n)
+	b := make([]byte, 2)
+	binary.BigEndian.PutUint16(b, i)
+	return b
+}
+
+func Int8(n int8) []byte {
+	b := make([]byte, 1)
+	b[0] = byte(n)
+	return b
+}
 
 func Bytes32(s string) []byte {
 	return common.RightPadBytes([]byte(s), 32)

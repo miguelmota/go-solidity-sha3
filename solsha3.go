@@ -17,14 +17,20 @@ func Uint256(n *big.Int) []byte {
 	return abi.U256(n)
 }
 
+func Uint256FromString(s string) []byte {
+	n := new(big.Int)
+	n.SetString(s, 10)
+	return Uint256(n)
+}
+
 func Uint128(n *big.Int) []byte {
 	return common.LeftPadBytes(n.Bytes(), 16)
 }
 
 func Uint64(n uint64) []byte {
-	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, n)
-	return buf.Bytes()
+	b := new(bytes.Buffer)
+	binary.Write(b, binary.BigEndian, n)
+	return b.Bytes()
 }
 
 func Uint32(n uint32) []byte {

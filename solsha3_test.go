@@ -105,6 +105,22 @@ func TestMain(t *testing.T) {
 
 	{
 		hash := SoliditySHA3(
+			Uint256FromString("100"),
+		)
+
+		expected := "26700e13983fefbd9cf16da2ed70fa5c6798ac55062a4803121a869731e308d2"
+
+		if got := hex.EncodeToString(hash); got != expected {
+			t.Errorf(
+				"SoliditySHA3 returned unexpected hash: got %v want %v",
+				got,
+				expected,
+			)
+		}
+	}
+
+	{
+		hash := SoliditySHA3(
 			Uint128(big.NewInt(100)),
 		)
 

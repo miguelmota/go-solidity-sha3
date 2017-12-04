@@ -342,7 +342,7 @@ func TestMain(t *testing.T) {
 				new BN('100000000000000', 10), // maker fee
 				new BN('200000000000000', 10), // taker fee
 				new BN('42', 10), // expiration unix timestamp sec
-				new BN('256', 10) // sal
+				new BN('256', 10) // salt
 			])
 		*/
 

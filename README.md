@@ -4,6 +4,16 @@
 
 This package is the Go equivalent of `require('ethereumjs-abi').soliditySHA3` [NPM module](https://www.npmjs.com/package/ethereumjs-abi).
 
+# Install
+
+```bash
+go get -u github.com/miguelmota/go-solidity-sha3
+```
+
+# Documentation
+
+[Documentation on GoDoc](https://godoc.org/github.com/miguelmota/go-solidity-sha3)
+
 # Usage
 
 Simple example

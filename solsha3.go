@@ -3,6 +3,7 @@ package solsha3
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto/sha3"
@@ -120,6 +121,17 @@ func SoliditySHA3(data ...[]byte) []byte {
 
 	hash.Write(bs)
 	result = hash.Sum(result)
+
+	return result
+}
+
+func SoliditySHA3WithPrefix(data []byte) []byte {
+	result := SoliditySHA3(
+		ConcatByteSlices(
+			[]byte(fmt.Sprintf("\x19Ethereum Signed Message:\n%v", len(data))),
+			data,
+		),
+	)
 
 	return result
 }

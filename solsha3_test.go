@@ -2,6 +2,7 @@ package solsha3
 
 import (
 	"encoding/hex"
+	"fmt"
 	"math/big"
 	"testing"
 )
@@ -321,6 +322,41 @@ func TestMain(t *testing.T) {
 		if got := hex.EncodeToString(hash); got != expected {
 			t.Errorf(
 				"SoliditySHA3 returned unexpected hash: got %v want %v",
+				got,
+				expected,
+			)
+		}
+	}
+
+	{
+		msg := []byte("hello")
+		hash := SoliditySHA3(
+			ConcatByteSlices(
+				[]byte(fmt.Sprintf("\x19Ethereum Signed Message:\n%v", len(msg))),
+				msg,
+			),
+		)
+
+		expected := "50b2c43fd39106bafbba0da34fc430e1f91e3c96ea2acee2bc34119f92b37750"
+
+		if got := hex.EncodeToString(hash); got != expected {
+			t.Errorf(
+				"SoliditySHA3WithPrefix returned unexpected hash: got %v want %v",
+				got,
+				expected,
+			)
+		}
+	}
+
+	{
+		msg := []byte("hello")
+		hash := SoliditySHA3WithPrefix(msg)
+
+		expected := "50b2c43fd39106bafbba0da34fc430e1f91e3c96ea2acee2bc34119f92b37750"
+
+		if got := hex.EncodeToString(hash); got != expected {
+			t.Errorf(
+				"SoliditySHA3WithPrefix returned unexpected hash: got %v want %v",
 				got,
 				expected,
 			)

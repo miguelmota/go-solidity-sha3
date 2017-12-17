@@ -17,4 +17,10 @@ func main() {
 	)
 
 	fmt.Println(hex.EncodeToString(hash))
+
+	hash2 := solsha3.SoliditySHA3WithPrefix(
+		solsha3.String("hello"),
+	)
+
+	fmt.Println(hex.EncodeToString(hash2))
 }

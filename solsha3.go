@@ -21,10 +21,10 @@ func Address(addr string) []byte {
 func Uint256(input interface{}) []byte {
 	switch v := input.(type) {
 	case *big.Int:
-		return abi.U256(n)
+		return abi.U256(v)
 	case string:
-		var bign *big.Int
-		bign.SetString(v)
+		bign := new(big.Int)
+		bign.SetString(v, 10)
 		return abi.U256(bign)
 	default:
 		return common.RightPadBytes([]byte(""), 32)

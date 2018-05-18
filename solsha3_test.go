@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math/big"
 	"testing"
+
+	"github.com/ethereum/go-ethereum/common"
 )
 
 func TestMain(t *testing.T) {
@@ -14,6 +16,38 @@ func TestMain(t *testing.T) {
 		)
 
 		expected := "4b998b071d7bb74aee1ce2cdcc268cb0f6409b4a3387fc915617ec08415298ad"
+
+		if got := hex.EncodeToString(hash); got != expected {
+			t.Errorf(
+				"SoliditySHA3 returned unexpected hash: got %v want %v",
+				got,
+				expected,
+			)
+		}
+	}
+
+	{
+		hash := SoliditySHA3(
+			Address(common.HexToAddress("0x12459c951127e0c374ff9105dda097662a027092")),
+		)
+
+		expected := "4b998b071d7bb74aee1ce2cdcc268cb0f6409b4a3387fc915617ec08415298ad"
+
+		if got := hex.EncodeToString(hash); got != expected {
+			t.Errorf(
+				"SoliditySHA3 returned unexpected hash: got %v want %v",
+				got,
+				expected,
+			)
+		}
+	}
+
+	{
+		hash := SoliditySHA3(
+			Address(0),
+		)
+
+		expected := "5380c7b7ae81a58eb98d9c78de4a1fd7fd9535fc953ed2be602daaa41767312a"
 
 		if got := hex.EncodeToString(hash); got != expected {
 			t.Errorf(

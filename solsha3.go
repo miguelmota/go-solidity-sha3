@@ -13,8 +13,15 @@ import (
 )
 
 // Address address
-func Address(addr string) []byte {
-	return common.HexToAddress(addr).Bytes()[:]
+func Address(input interface{}) []byte {
+	switch v := input.(type) {
+	case common.Address:
+		return v.Bytes()[:]
+	case string:
+		return common.HexToAddress(v).Bytes()[:]
+	default:
+		return common.HexToAddress("").Bytes()[:]
+	}
 }
 
 // Uint256 uint256
@@ -29,13 +36,6 @@ func Uint256(input interface{}) []byte {
 	default:
 		return common.RightPadBytes([]byte(""), 32)
 	}
-}
-
-// Uint256FromString uint256
-func Uint256FromString(s string) []byte {
-	n := new(big.Int)
-	n.SetString(s, 10)
-	return Uint256(n)
 }
 
 // Uint128 uint128
@@ -129,17 +129,28 @@ func Bytes32(input interface{}) []byte {
 }
 
 // String string
-func String(s string) []byte {
-	return []byte(s)
+func String(input interface{}) []byte {
+	switch v := input.(type) {
+	case []byte:
+		return v
+	case string:
+		return []byte(v)
+	default:
+		return []byte("")
+	}
 }
 
 // Bool bool
-func Bool(t bool) []byte {
-	if t {
-		return []byte{0x1}
+func Bool(input interface{}) []byte {
+	switch v := input.(type) {
+	case bool:
+		if v {
+			return []byte{0x1}
+		}
+		return []byte{0x0}
+	default:
+		return []byte{0x0}
 	}
-
-	return []byte{0x0}
 }
 
 // ConcatByteSlices concat byte slices

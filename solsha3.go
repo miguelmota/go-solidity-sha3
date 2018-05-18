@@ -18,8 +18,17 @@ func Address(addr string) []byte {
 }
 
 // Uint256 uint256
-func Uint256(n *big.Int) []byte {
-	return abi.U256(n)
+func Uint256(input interface{}) []byte {
+	switch v := input.(type) {
+	case *big.Int:
+		return abi.U256(n)
+	case string:
+		var bign *big.Int
+		bign.SetString(v)
+		return abi.U256(bign)
+	default:
+		return common.RightPadBytes([]byte(""), 32)
+	}
 }
 
 // Uint256FromString uint256

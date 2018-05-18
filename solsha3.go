@@ -3,6 +3,7 @@ package solsha3
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"math/big"
 
@@ -103,8 +104,16 @@ func Int8(n int8) []byte {
 }
 
 // Bytes32 bytes32
-func Bytes32(s string) []byte {
-	return common.RightPadBytes([]byte(s), 32)
+func Bytes32(input interface{}) []byte {
+	switch v := input.(type) {
+	case []byte:
+		return common.RightPadBytes(v, 32)
+	case string:
+		str := fmt.Sprintf("%x", v)
+		hexb, _ := hex.DecodeString(str)
+		return common.RightPadBytes(hexb, 32)
+	}
+	return common.RightPadBytes([]byte(""), 32)
 }
 
 // String string

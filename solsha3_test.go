@@ -42,6 +42,39 @@ func TestMain(t *testing.T) {
 
 	{
 		hash := SoliditySHA3(
+			Bytes32("a"),
+		)
+
+		expected := "294587bf977c4010a60dbad811c63531f90f6ec512975bc6c9a93f8f361cad72"
+
+		if got := hex.EncodeToString(hash); got != expected {
+			t.Errorf(
+				"SoliditySHA3 returned unexpected hash: got %v want %v",
+				got,
+				expected,
+			)
+		}
+	}
+
+	{
+		hexb, _ := hex.DecodeString("a")
+		hash := SoliditySHA3(
+			Bytes32(hexb),
+		)
+
+		expected := "290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
+
+		if got := hex.EncodeToString(hash); got != expected {
+			t.Errorf(
+				"SoliditySHA3 returned unexpected hash: got %v want %v",
+				got,
+				expected,
+			)
+		}
+	}
+
+	{
+		hash := SoliditySHA3(
 			String("somedata"),
 		)
 

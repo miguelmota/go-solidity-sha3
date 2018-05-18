@@ -9,6 +9,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
+// TODO: write table tests
+
 func TestMain(t *testing.T) {
 	{
 		hash := SoliditySHA3(

@@ -446,6 +446,22 @@ func Bytes32(input interface{}) []byte {
 	}
 }
 
+// Bytes16 bytes16
+func Bytes16(input interface{}) []byte {
+	switch v := input.(type) {
+	case [16]byte:
+		return common.RightPadBytes(v[:], 16)
+	case []byte:
+		return common.RightPadBytes(v, 16)
+	case string:
+		str := fmt.Sprintf("%x", v)
+		hexb, _ := hex.DecodeString(str)
+		return common.RightPadBytes(hexb, 16)
+	default:
+		return common.RightPadBytes([]byte(""), 16)
+	}
+}
+
 // String string
 func String(input interface{}) []byte {
 	switch v := input.(type) {

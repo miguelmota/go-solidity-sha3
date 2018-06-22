@@ -3,8 +3,9 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/miguelmota/go-solidity-sha3"
 	"math/big"
+
+	"github.com/miguelmota/go-solidity-sha3"
 )
 
 func main() {
@@ -16,11 +17,11 @@ func main() {
 		solsha3.Bool(true),
 	)
 
-	fmt.Println(hex.EncodeToString(hash))
+	fmt.Println(hex.EncodeToString(hash)) // 417a4c44724701ba79bb363151dff48909bc058a2c75a81e9cf5208ae4699369
 
 	hash2 := solsha3.SoliditySHA3WithPrefix(
 		solsha3.String("hello"),
 	)
 
-	fmt.Println(hex.EncodeToString(hash2))
+	fmt.Println(hex.EncodeToString(hash2)) // 50b2c43fd39106bafbba0da34fc430e1f91e3c96ea2acee2bc34119f92b37750
 }

@@ -9,7 +9,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto/sha3"
+	"golang.org/x/crypto/sha3"
 )
 
 // Address address
@@ -502,7 +502,7 @@ func ConcatByteSlices(arrays ...[]byte) []byte {
 func SoliditySHA3(data ...[]byte) []byte {
 	var result []byte
 
-	hash := sha3.NewKeccak256()
+	hash := sha3.NewLegacyKeccak256()
 	bs := ConcatByteSlices(data...)
 
 	hash.Write(bs)

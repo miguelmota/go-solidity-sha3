@@ -7,4 +7,4 @@ test:
 
 .PHONY: deps
 deps:
-	@GO111MODULE=1 go mod vendor
+	@GO111MODULE=on go mod vendor

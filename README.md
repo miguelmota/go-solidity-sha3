@@ -1,6 +1,6 @@
 <h3 align="center">
   <br />
-  <img src="https://user-images.githubusercontent.com/168240/51433320-bdb56100-1bfc-11e9-963d-4b39a3c51e51.png" alt="logo" width="600" />
+  <img src="https://user-images.githubusercontent.com/168240/51433394-10dbe380-1bfe-11e9-86c8-d4d57f77fb11.png" alt="logo" width="700" />
   <br />
   <br />
   <br />

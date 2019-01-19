@@ -14,17 +14,17 @@
 
 This package is the Go equivalent of `require('ethereumjs-abi').soliditySHA3` [NPM module](https://www.npmjs.com/package/ethereumjs-abi).
 
-# Install
+## Install
 
 ```bash
 go get -u github.com/miguelmota/go-solidity-sha3
 ```
 
-# Documentation
+## Documentation
 
 [Documentation on GoDoc](https://godoc.org/github.com/miguelmota/go-solidity-sha3)
 
-# Usage
+## Usage
 
 Simple example
 
@@ -57,6 +57,6 @@ Output
 417a4c44724701ba79bb363151dff48909bc058a2c75a81e9cf5208ae4699369
 ```
 
-# License
+## License
 
 MIT

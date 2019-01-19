@@ -1,3 +1,11 @@
+<h1 align="center">
+  <br />
+  <img src="https://user-images.githubusercontent.com/168240/51433320-bdb56100-1bfc-11e9-963d-4b39a3c51e51.png" alt="logo" width="600" />
+  <br />
+  <br />
+  <br />
+</h1>
+
 # go-solidity-sha3
 
 > Generate Solidity SHA3 (Keccak256) hashes in Go.

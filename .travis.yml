@@ -5,5 +5,4 @@ go:
   - "master"
 
 script:
-  - go get -u github.com/ethereum/go-ethereum
   - make test

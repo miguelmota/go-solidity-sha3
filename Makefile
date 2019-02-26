@@ -8,3 +8,8 @@ test:
 .PHONY: deps
 deps:
 	@GO111MODULE=on go mod vendor
+
+.PHONY: release
+release:
+	@rm -rf dist
+	@goreleaser

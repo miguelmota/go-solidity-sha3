@@ -6,11 +6,15 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math/big"
+	"reflect"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"golang.org/x/crypto/sha3"
 )
+
+// TODO: refactor and remove duplicated code
 
 // Address address
 func Address(input interface{}) []byte {
@@ -18,10 +22,33 @@ func Address(input interface{}) []byte {
 	case common.Address:
 		return v.Bytes()[:]
 	case string:
-		return common.HexToAddress(v).Bytes()[:]
-	default:
-		return common.HexToAddress("").Bytes()[:]
+		decoded, err := hex.DecodeString(strings.TrimPrefix(v, "0x"))
+		if err != nil {
+			panic(err)
+		}
+
+		return decoded
+	case []byte:
+		return v
 	}
+
+	if isArray(input) {
+		return AddressArray(input)
+	}
+
+	return common.HexToAddress("").Bytes()[:]
+}
+
+// AddressArray address
+func AddressArray(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Address(val), 32)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Uint256 uint256
@@ -33,9 +60,25 @@ func Uint256(input interface{}) []byte {
 		bn := new(big.Int)
 		bn.SetString(v, 10)
 		return abi.U256(bn)
-	default:
-		return common.RightPadBytes([]byte(""), 32)
 	}
+
+	if isArray(input) {
+		return Uint256Array(input)
+	}
+
+	return common.RightPadBytes([]byte(""), 32)
+}
+
+// Uint256Array uint256 array
+func Uint256Array(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Uint256(val), 32)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Uint128 uint128
@@ -47,9 +90,25 @@ func Uint128(input interface{}) []byte {
 		bn := new(big.Int)
 		bn.SetString(v, 10)
 		return common.LeftPadBytes(bn.Bytes(), 16)
-	default:
-		return common.LeftPadBytes([]byte(""), 16)
 	}
+
+	if isArray(input) {
+		return Uint128Array(input)
+	}
+
+	return common.LeftPadBytes([]byte(""), 16)
+}
+
+// Uint128Array uint128
+func Uint128Array(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Uint128(val), 32)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Uint64 uint64
@@ -85,7 +144,24 @@ func Uint64(input interface{}) []byte {
 	default:
 		binary.Write(b, binary.BigEndian, uint64(0))
 	}
+
+	if isArray(input) {
+		return Uint64Array(input)
+	}
+
 	return b.Bytes()
+}
+
+// Uint64Array uint64 array
+func Uint64Array(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Uint64(val), 32)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Uint32 uint32
@@ -121,7 +197,24 @@ func Uint32(input interface{}) []byte {
 	default:
 		binary.Write(b, binary.BigEndian, uint32(0))
 	}
+
+	if isArray(input) {
+		return Uint32Array(input)
+	}
+
 	return b.Bytes()
+}
+
+// Uint32Array uint32 array
+func Uint32Array(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Uint32(val), 32)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Uint16 uint16
@@ -157,7 +250,24 @@ func Uint16(input interface{}) []byte {
 	default:
 		binary.Write(b, binary.BigEndian, uint16(0))
 	}
+
+	if isArray(input) {
+		return Uint16Array(input)
+	}
+
 	return b.Bytes()
+}
+
+// Uint16Array uint16 array
+func Uint16Array(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Uint16(val), 32)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Uint8 uint8
@@ -193,7 +303,24 @@ func Uint8(input interface{}) []byte {
 	default:
 		binary.Write(b, binary.BigEndian, uint8(0))
 	}
+
+	if isArray(input) {
+		return Uint8Array(input)
+	}
+
 	return b.Bytes()
+}
+
+// Uint8Array uint8 array
+func Uint8Array(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Uint8(val), 32)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Int256 int256
@@ -235,10 +362,25 @@ func Int256(input interface{}) []byte {
 	case int:
 		bn := big.NewInt(int64(v))
 		return common.LeftPadBytes(bn.Bytes(), 32)
-	default:
-		bn := big.NewInt(int64(0))
-		return common.LeftPadBytes(bn.Bytes(), 32)
 	}
+
+	if isArray(input) {
+		return Int256Array(input)
+	}
+
+	return common.LeftPadBytes([]byte{}, 32)
+}
+
+// Int256Array int256 array
+func Int256Array(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Int256(val), 32)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Int128 int128
@@ -280,10 +422,25 @@ func Int128(input interface{}) []byte {
 	case int:
 		bn := big.NewInt(int64(v))
 		return common.LeftPadBytes(bn.Bytes(), 16)
-	default:
-		bn := big.NewInt(int64(0))
-		return common.LeftPadBytes(bn.Bytes(), 16)
 	}
+
+	if isArray(input) {
+		return Int128Array(input)
+	}
+
+	return common.LeftPadBytes([]byte{}, 16)
+}
+
+// Int128Array int128 array
+func Int128Array(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Int128(val), 32)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Int64 int64
@@ -319,7 +476,24 @@ func Int64(input interface{}) []byte {
 	default:
 		binary.BigEndian.PutUint64(b, uint64(0))
 	}
+
+	if isArray(input) {
+		return Int64Array(input)
+	}
+
 	return b
+}
+
+// Int64Array int64 array
+func Int64Array(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Int64(val), 32)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Int32 int32
@@ -355,7 +529,24 @@ func Int32(input interface{}) []byte {
 	default:
 		binary.BigEndian.PutUint32(b, uint32(0))
 	}
+
+	if isArray(input) {
+		return Int32Array(input)
+	}
+
 	return b
+}
+
+// Int32Array int32
+func Int32Array(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Int32(val), 32)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Int16 int16
@@ -391,7 +582,24 @@ func Int16(input interface{}) []byte {
 	default:
 		binary.BigEndian.PutUint16(b, uint16(0))
 	}
+
+	if isArray(input) {
+		return Int16Array(input)
+	}
+
 	return b
+}
+
+// Int16Array int16 array
+func Int16Array(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Int16(val), 32)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Int8 int8
@@ -427,7 +635,24 @@ func Int8(input interface{}) []byte {
 	default:
 		b[0] = byte(int8(0))
 	}
+
+	if isArray(input) {
+		return Int8Array(input)
+	}
+
 	return b
+}
+
+// Int8Array int8 array
+func Int8Array(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Int8(val), 32)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Bytes32 bytes32
@@ -469,9 +694,25 @@ func String(input interface{}) []byte {
 		return v
 	case string:
 		return []byte(v)
-	default:
-		return []byte("")
 	}
+
+	if isArray(input) {
+		return StringArray(input)
+	}
+
+	return []byte("")
+}
+
+// StringArray string
+func StringArray(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := String(val)
+		values = append(values, result...)
+	}
+	return values
 }
 
 // Bool bool
@@ -482,20 +723,25 @@ func Bool(input interface{}) []byte {
 			return []byte{0x1}
 		}
 		return []byte{0x0}
-	default:
-		return []byte{0x0}
 	}
+
+	if isArray(input) {
+		return BoolArray(input)
+	}
+
+	return []byte{0x0}
 }
 
-// ConcatByteSlices concat byte slices
-func ConcatByteSlices(arrays ...[]byte) []byte {
-	var result []byte
-
-	for _, b := range arrays {
-		result = append(result, b...)
+// BoolArray bool array
+func BoolArray(input interface{}) []byte {
+	var values []byte
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+		result := common.LeftPadBytes(Bool(val), 32)
+		values = append(values, result...)
 	}
-
-	return result
+	return values
 }
 
 // SoliditySHA3 solidity sha3
@@ -503,7 +749,7 @@ func SoliditySHA3(data ...[]byte) []byte {
 	var result []byte
 
 	hash := sha3.NewLegacyKeccak256()
-	bs := ConcatByteSlices(data...)
+	bs := concatByteSlices(data...)
 
 	hash.Write(bs)
 	result = hash.Sum(result)
@@ -514,11 +760,31 @@ func SoliditySHA3(data ...[]byte) []byte {
 // SoliditySHA3WithPrefix solidity sha3 with prefix
 func SoliditySHA3WithPrefix(data []byte) []byte {
 	result := SoliditySHA3(
-		ConcatByteSlices(
+		concatByteSlices(
 			[]byte(fmt.Sprintf("\x19Ethereum Signed Message:\n%v", len(data))),
 			data,
 		),
 	)
 
 	return result
+}
+
+// ConcatByteSlices concat byte slices
+func ConcatByteSlices(arrays ...[]byte) []byte {
+	return concatByteSlices(arrays...)
+}
+
+func concatByteSlices(arrays ...[]byte) []byte {
+	var result []byte
+
+	for _, b := range arrays {
+		result = append(result, b...)
+	}
+
+	return result
+}
+
+func isArray(value interface{}) bool {
+	return reflect.TypeOf(value).Kind() == reflect.Array ||
+		reflect.TypeOf(value).Kind() == reflect.Slice
 }

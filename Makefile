@@ -3,7 +3,7 @@ all:
 
 .PHONY: test
 test:
-	go test -v ./...
+	@go test -v `go list ./... | grep -v example` && echo "ALL PASS" || echo "FAILURE"
 
 .PHONY: deps
 deps:

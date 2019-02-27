@@ -12,7 +12,7 @@
 
 [![License](http://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/miguelmota/go-solidity-sha3/master/LICENSE.md) [![Build Status](https://travis-ci.org/miguelmota/go-solidity-sha3.svg?branch=master)](https://travis-ci.org/miguelmota/go-solidity-sha3) [![Go Report Card](https://goreportcard.com/badge/github.com/miguelmota/go-solidity-sha3?)](https://goreportcard.com/report/github.com/miguelmota/go-solidity-sha3) [![GoDoc](https://godoc.org/github.com/miguelmota/go-solidity-sha3?status.svg)](https://godoc.org/github.com/miguelmota/go-solidity-sha3)
 
-This package is the Go equivalent of `require('ethereumjs-abi').soliditySHA3` [NPM module](https://www.npmjs.com/package/ethereumjs-abi).
+This package is the Go equivalent of `require('ethers).utils.solidityKeccak256` [NPM module](https://www.npmjs.com/package/ethers).
 
 ## Install
 
@@ -24,37 +24,78 @@ go get -u github.com/miguelmota/go-solidity-sha3
 
 [Documentation on GoDoc](https://godoc.org/github.com/miguelmota/go-solidity-sha3)
 
-## Usage
+## Getting started
 
-Simple example
+Simple example:
 
 ```go
 package main
 
 import (
-  "encoding/hex"
-  "fmt"
-  "github.com/miguelmota/go-solidity-sha3"
-  "math/big"
+	"encoding/hex"
+	"fmt"
+
+	"github.com/miguelmota/go-solidity-sha3"
 )
 
 func main() {
-  hash := solsha3.SoliditySHA3(
-    solsha3.Address("0x12459c951127e0c374ff9105dda097662a027093"),
-    solsha3.Uint256(big.NewInt(100)),
-    solsha3.String("foo"),
-    solsha3.Bytes32("bar"),
-    solsha3.Bool(true),
-  )
+	hash := solsha3.SoliditySHA3(
+		// types
+		[]string{"address", "uint256"},
 
-  fmt.Println(hex.EncodeToString(hash))
+		// values
+		"0x935F7770265D0797B621c49A5215849c333Cc3ce",
+		"100000000000000000",
+	)
+
+	fmt.Println(hex.EncodeToString(hash))
 }
 ```
 
-Output
+Output:
 
 ```bash
-417a4c44724701ba79bb363151dff48909bc058a2c75a81e9cf5208ae4699369
+0a3844b522d9e3a837ae56d4c57d668feb26325834bf4ba49e153d84ed7ad53d
+```
+
+More complex example:
+
+```go
+package main
+
+import (
+	"encoding/hex"
+	"fmt"
+
+	"github.com/miguelmota/go-solidity-sha3"
+)
+
+func main() {
+	hash := solsha3.SoliditySHA3(
+		// types
+		[]string{"address", "bytes1", "uint8[]", "bytes32", "uint256", "address[]", "uint32"},
+
+		// values
+		"0x935F7770265D0797B621c49A5215849c333Cc3ce",
+		"0xa",
+		[]uint8{128, 255},
+		"0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45",
+		"100000000000000000",
+		[]string{
+			"0x13D94859b23AF5F610aEfC2Ae5254D4D7E3F191a",
+			"0x473029549e9d898142a169d7234c59068EDcBB33",
+		},
+		123456789,
+	)
+
+	fmt.Println(hex.EncodeToString(hash))
+}
+```
+
+Output:
+
+```bash
+ad390a98c1c32cdb1f046f6887a4109f12290b690127e6e15da4ca210235510e
 ```
 
 ## License

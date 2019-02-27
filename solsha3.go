@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"math/big"
 	"reflect"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -22,7 +24,16 @@ func Address(input interface{}) []byte {
 	case common.Address:
 		return v.Bytes()[:]
 	case string:
-		decoded, err := hex.DecodeString(strings.TrimPrefix(v, "0x"))
+		v = strings.TrimPrefix(v, "0x")
+		if v == "" || v == "0" {
+			return []byte{0}
+		}
+
+		if len(v)%2 == 1 {
+			v = "0" + v
+		}
+
+		decoded, err := hex.DecodeString(v)
 		if err != nil {
 			panic(err)
 		}
@@ -663,6 +674,10 @@ func Bytes32(input interface{}) []byte {
 	case []byte:
 		return common.RightPadBytes(v, 32)
 	case string:
+		if isHex(v) {
+			hexb, _ := hex.DecodeString(strings.TrimPrefix(v, "0x"))
+			return common.RightPadBytes(hexb, 32)
+		}
 		str := fmt.Sprintf("%x", v)
 		hexb, _ := hex.DecodeString(str)
 		return common.RightPadBytes(hexb, 32)
@@ -745,16 +760,29 @@ func BoolArray(input interface{}) []byte {
 }
 
 // SoliditySHA3 solidity sha3
-func SoliditySHA3(data ...[]byte) []byte {
-	var result []byte
+func SoliditySHA3(data ...interface{}) []byte {
+	types, ok := data[0].([]string)
+	if len(data) > 1 && ok {
+		rest := data[1:]
+		if len(rest) == len(types) {
+			return solsha3(types, data[1:]...)
+		}
+	}
 
+	var v [][]byte
+	for _, item := range data {
+		v = append(v, item.([]byte))
+	}
+	return solsha3Legacy(v...)
+}
+
+// solsha3Legacy solidity sha3
+func solsha3Legacy(data ...[]byte) []byte {
 	hash := sha3.NewLegacyKeccak256()
 	bs := concatByteSlices(data...)
 
 	hash.Write(bs)
-	result = hash.Sum(result)
-
-	return result
+	return hash.Sum(nil)
 }
 
 // SoliditySHA3WithPrefix solidity sha3 with prefix
@@ -787,4 +815,212 @@ func concatByteSlices(arrays ...[]byte) []byte {
 func isArray(value interface{}) bool {
 	return reflect.TypeOf(value).Kind() == reflect.Array ||
 		reflect.TypeOf(value).Kind() == reflect.Slice
+}
+
+// solsha3 solidity sha3
+func solsha3(types []string, values ...interface{}) []byte {
+
+	var b [][]byte
+	for i, typ := range types {
+		b = append(b, pack(typ, values[i], false))
+	}
+
+	hash := sha3.NewLegacyKeccak256()
+	bs := concatByteSlices(b...)
+
+	hash.Write(bs)
+	return hash.Sum(nil)
+}
+
+func padZeros(value []byte, width int) []byte {
+	return common.LeftPadBytes(value, width)
+}
+
+var zeros = "0000000000000000000000000000000000000000000000000000000000000000"
+
+func pack(typ string, value interface{}, _isArray bool) []byte {
+	switch typ {
+	case "address":
+		if _isArray {
+			return padZeros(Address(value), 32)
+		}
+
+		return Address(value)
+	case "string":
+		return String(value)
+	case "bool":
+		if _isArray {
+			return padZeros(Bool(value), 32)
+		}
+
+		return Bool(value)
+	}
+
+	regexNumber := regexp.MustCompile(`^(u?int)([0-9]*)$`)
+	matches := regexNumber.FindAllStringSubmatch(typ, -1)
+	if len(matches) > 0 {
+		match := matches[0]
+		var err error
+		size := 256
+		if len(match) > 1 {
+			//signed = match[1] == "int"
+		}
+		if len(match) > 2 {
+			size, err = strconv.Atoi(match[2])
+			if err != nil {
+				panic(err)
+			}
+		}
+
+		_ = size
+		if (size%8 != 0) || size == 0 || size > 256 {
+			panic("invalid number type " + typ)
+		}
+
+		if _isArray {
+			size = 256
+		}
+
+		var v []byte
+		if strings.HasPrefix(typ, "int8") {
+			v = Int8(value)
+		} else if strings.HasPrefix(typ, "int16") {
+			v = Int16(value)
+		} else if strings.HasPrefix(typ, "int32") {
+			v = Int32(value)
+		} else if strings.HasPrefix(typ, "int64") {
+			v = Int64(value)
+		} else if strings.HasPrefix(typ, "int128") {
+			v = Int128(value)
+		} else if strings.HasPrefix(typ, "int256") {
+			v = Int256(value)
+		} else if strings.HasPrefix(typ, "uint8") {
+			v = Uint8(value)
+		} else if strings.HasPrefix(typ, "uint16") {
+			v = Uint16(value)
+		} else if strings.HasPrefix(typ, "uint32") {
+			v = Uint32(value)
+		} else if strings.HasPrefix(typ, "uint128") {
+			v = Uint128(value)
+		} else if strings.HasPrefix(typ, "uint64") {
+			v = Uint64(value)
+		} else if strings.HasPrefix(typ, "uint256") {
+			v = Uint256(value)
+		}
+		return padZeros(v, size/8)
+	}
+
+	regexBytes := regexp.MustCompile(`^bytes([0-9]+)$`)
+	matches = regexBytes.FindAllStringSubmatch(typ, -1)
+	if len(matches) > 0 {
+		match := matches[0]
+
+		size, err := strconv.Atoi(match[1])
+		if err != nil {
+			panic(err)
+		}
+
+		_ = size
+
+		strSize := strconv.Itoa(size)
+		if strSize != match[1] || size == 0 || size > 32 {
+			panic("invalid number type " + typ)
+		}
+
+		//if (bytes_1.arrayify(value).byteLength !== size) {
+		//throw new Error('invalid value for ' + type);
+		//}
+
+		if _isArray {
+			s := reflect.ValueOf(value)
+			v := s.Index(0).Bytes()
+			z := make([]byte, 64)
+			copy(z[:], v[:])
+			return z[:]
+		}
+
+		str, isString := value.(string)
+		if isString && isHex(str) {
+			s := strings.TrimPrefix(str, "0x")
+			if len(s)%2 == 1 {
+				s = "0" + s
+			}
+			hexb, err := hex.DecodeString(s)
+			if err != nil {
+				panic(err)
+			}
+			z := make([]byte, size)
+			copy(z[:], hexb)
+			return z
+		} else if isString {
+			s := reflect.ValueOf(value)
+			z := make([]byte, size)
+			copy(z[:], s.Bytes())
+			return z
+		}
+
+		s := reflect.ValueOf(value)
+		z := make([]byte, size)
+		b := make([]byte, s.Len())
+		for i := 0; i < s.Len(); i++ {
+			b[i] = s.Index(i).Interface().(byte)
+		}
+		copy(z[:], b[:])
+		return z
+	}
+
+	regexArray := regexp.MustCompile(`^(.*)\[([0-9]*)\]$`)
+	matches = regexArray.FindAllStringSubmatch(typ, -1)
+	if len(matches) > 0 {
+		match := matches[0]
+
+		_ = match
+		if isArray(value) {
+			baseType := match[1]
+			k := reflect.ValueOf(value)
+			count := k.Len()
+			var err error
+			if len(match) > 1 && match[2] != "" {
+				count, err = strconv.Atoi(match[2])
+				if err != nil {
+					panic(err)
+				}
+			}
+			if count != k.Len() {
+				panic("invalid value for " + typ)
+			}
+
+			var result [][]byte
+			for i := 0; i < k.Len(); i++ {
+				val := k.Index(i).Interface()
+
+				result = append(result, pack(baseType, val, true))
+			}
+
+			return concatByteSlices(result...)
+		}
+	}
+	return nil
+}
+
+// Pack ...
+func Pack(types []string, values []interface{}) []byte {
+	if len(types) != len(values) {
+		panic("type/value count mismatch")
+	}
+
+	var tight [][]byte
+	for i, typ := range types {
+		tight = append(tight, pack(typ, values[i], false))
+	}
+
+	return concatByteSlices(tight...)
+}
+
+func keccak256(types []string, values []interface{}) {
+	//return keccak256_1.keccak256(pack(types, values))
+}
+
+func isHex(str string) bool {
+	return strings.HasPrefix(str, "0x")
 }

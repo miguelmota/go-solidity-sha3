@@ -767,6 +767,10 @@ func SoliditySHA3(data ...interface{}) []byte {
 		if len(rest) == len(types) {
 			return solsha3(types, data[1:]...)
 		}
+		iface, ok := data[1].([]interface{})
+		if ok {
+			return solsha3(types, iface...)
+		}
 	}
 
 	var v [][]byte

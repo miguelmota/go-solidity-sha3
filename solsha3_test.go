@@ -721,4 +721,34 @@ func TestSolSha3(t *testing.T) {
 			t.Error(result, expected)
 		}
 	}
+
+	{
+		hash := SoliditySHA3(
+			[]string{"address", "uint256"},
+			"0x935F7770265D0797B621c49A5215849c333Cc3ce",
+			"100000000000000000",
+		)
+
+		expected := "0a3844b522d9e3a837ae56d4c57d668feb26325834bf4ba49e153d84ed7ad53d"
+		result := hex.EncodeToString(hash)
+		if result != expected {
+			t.Error(result, expected)
+		}
+	}
+
+	{
+		types := []string{"address", "uint256"}
+		inputs := []interface{}{
+			"0x935F7770265D0797B621c49A5215849c333Cc3ce",
+			"100000000000000000",
+		}
+
+		hash := SoliditySHA3(types, inputs)
+
+		expected := "0a3844b522d9e3a837ae56d4c57d668feb26325834bf4ba49e153d84ed7ad53d"
+		result := hex.EncodeToString(hash)
+		if result != expected {
+			t.Error(result, expected)
+		}
+	}
 }

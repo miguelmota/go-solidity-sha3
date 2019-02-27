@@ -97,9 +97,9 @@ Output:
 ad390a98c1c32cdb1f046f6887a4109f12290b690127e6e15da4ca210235510e
 ```
 
-Same example as before but using two separate array for types and values:
+Same example as before but using two separate arrays for types and values:
 
-```
+```go
 package main
 
 import (

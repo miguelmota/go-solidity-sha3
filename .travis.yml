@@ -5,4 +5,5 @@ go:
   - "master"
 
 script:
+  - go get ./
   - make test

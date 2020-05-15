@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/common"
 	"golang.org/x/crypto/sha3"
 )
@@ -66,11 +66,11 @@ func AddressArray(input interface{}) []byte {
 func Uint256(input interface{}) []byte {
 	switch v := input.(type) {
 	case *big.Int:
-		return abi.U256(v)
+		return math.U256Bytes(v)
 	case string:
 		bn := new(big.Int)
 		bn.SetString(v, 10)
-		return abi.U256(bn)
+		return math.U256Bytes(bn)
 	}
 
 	if isArray(input) {

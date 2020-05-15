@@ -1,4 +1,4 @@
-module github.com/miguelmota/go-solidity-sha3
+module github.com/offchainlabs/go-solidity-sha3
 
 require (
 	github.com/btcsuite/btcd v0.0.0-20190109040709-5bda5314ca95 // indirect

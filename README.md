@@ -10,14 +10,18 @@
 
 > Generate Solidity SHA3 (Keccak256) hashes in Go.
 
-[![License](http://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/miguelmota/go-solidity-sha3/master/LICENSE.md) [![Build Status](https://travis-ci.org/miguelmota/go-solidity-sha3.svg?branch=master)](https://travis-ci.org/miguelmota/go-solidity-sha3) [![Go Report Card](https://goreportcard.com/badge/github.com/miguelmota/go-solidity-sha3?)](https://goreportcard.com/report/github.com/miguelmota/go-solidity-sha3) [![GoDoc](https://godoc.org/github.com/miguelmota/go-solidity-sha3?status.svg)](https://godoc.org/github.com/miguelmota/go-solidity-sha3)
+[![License](http://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/miguelmota/go-solidity-sha3/master/LICENSE.md)
+[![Build Status](https://travis-ci.org/miguelmota/go-solidity-sha3.svg?branch=master)](https://travis-ci.org/miguelmota/go-solidity-sha3)
+[![Go Report Card](https://goreportcard.com/badge/github.com/miguelmota/go-solidity-sha3?)](https://goreportcard.com/report/github.com/miguelmota/go-solidity-sha3)
+[![GoDoc](https://godoc.org/github.com/miguelmota/go-solidity-sha3?status.svg)](https://godoc.org/github.com/miguelmota/go-solidity-sha3)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
 This package is the Go equivalent of `require('ethers').utils.solidityKeccak256` [NPM module](https://www.npmjs.com/package/ethers).
 
 ## Install
 
 ```bash
-go get -u github.com/miguelmota/go-solidity-sha3
+go get github.com/miguelmota/go-solidity-sha3
 ```
 
 ## Documentation
@@ -97,6 +101,12 @@ Output:
 ```bash
 ad390a98c1c32cdb1f046f6887a4109f12290b690127e6e15da4ca210235510e
 ```
+
+## Contributing
+
+Pull requests are welcome!
+
+For contributions please create a new branch and submit a pull request for review.
 
 ## License
 

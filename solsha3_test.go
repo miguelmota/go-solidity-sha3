@@ -631,7 +631,6 @@ func TestSolSha3(t *testing.T) {
 			[3]uint8{1, 2, 3},
 		)
 
-		fmt.Println("WTF")
 		fmt.Println(hex.EncodeToString(hash))
 		//6e0c627900b24bd432fe7b1f713f1b0744091a646a9fe4a65a18dfed21f2949c
 

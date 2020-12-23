@@ -11,12 +11,59 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/math"
 	"golang.org/x/crypto/sha3"
 )
 
 // TODO: refactor and remove duplicated code
+
+// SoliditySHA3 solidity sha3
+func SoliditySHA3(data ...interface{}) []byte {
+	types, ok := data[0].([]string)
+	if len(data) > 1 && ok {
+		rest := data[1:]
+		if len(rest) == len(types) {
+			return solsha3(types, data[1:]...)
+		}
+		iface, ok := data[1].([]interface{})
+		if ok {
+			return solsha3(types, iface...)
+		}
+	}
+
+	var v [][]byte
+	for _, item := range data {
+		v = append(v, item.([]byte))
+	}
+	return solsha3Legacy(v...)
+}
+
+// solsha3Legacy solidity sha3
+func solsha3Legacy(data ...[]byte) []byte {
+	hash := sha3.NewLegacyKeccak256()
+	bs := concatByteSlices(data...)
+
+	hash.Write(bs)
+	return hash.Sum(nil)
+}
+
+// SoliditySHA3WithPrefix solidity sha3 with prefix
+func SoliditySHA3WithPrefix(data []byte) []byte {
+	result := SoliditySHA3(
+		concatByteSlices(
+			[]byte(fmt.Sprintf("\x19Ethereum Signed Message:\n%v", len(data))),
+			data,
+		),
+	)
+
+	return result
+}
+
+// ConcatByteSlices concat byte slices
+func ConcatByteSlices(arrays ...[]byte) []byte {
+	return concatByteSlices(arrays...)
+}
 
 // Address address
 func Address(input interface{}) []byte {
@@ -759,53 +806,6 @@ func BoolArray(input interface{}) []byte {
 	return values
 }
 
-// SoliditySHA3 solidity sha3
-func SoliditySHA3(data ...interface{}) []byte {
-	types, ok := data[0].([]string)
-	if len(data) > 1 && ok {
-		rest := data[1:]
-		if len(rest) == len(types) {
-			return solsha3(types, data[1:]...)
-		}
-		iface, ok := data[1].([]interface{})
-		if ok {
-			return solsha3(types, iface...)
-		}
-	}
-
-	var v [][]byte
-	for _, item := range data {
-		v = append(v, item.([]byte))
-	}
-	return solsha3Legacy(v...)
-}
-
-// solsha3Legacy solidity sha3
-func solsha3Legacy(data ...[]byte) []byte {
-	hash := sha3.NewLegacyKeccak256()
-	bs := concatByteSlices(data...)
-
-	hash.Write(bs)
-	return hash.Sum(nil)
-}
-
-// SoliditySHA3WithPrefix solidity sha3 with prefix
-func SoliditySHA3WithPrefix(data []byte) []byte {
-	result := SoliditySHA3(
-		concatByteSlices(
-			[]byte(fmt.Sprintf("\x19Ethereum Signed Message:\n%v", len(data))),
-			data,
-		),
-	)
-
-	return result
-}
-
-// ConcatByteSlices concat byte slices
-func ConcatByteSlices(arrays ...[]byte) []byte {
-	return concatByteSlices(arrays...)
-}
-
 func concatByteSlices(arrays ...[]byte) []byte {
 	var result []byte
 
@@ -823,7 +823,6 @@ func isArray(value interface{}) bool {
 
 // solsha3 solidity sha3
 func solsha3(types []string, values ...interface{}) []byte {
-
 	var b [][]byte
 	for i, typ := range types {
 		b = append(b, pack(typ, values[i], false))
@@ -831,7 +830,6 @@ func solsha3(types []string, values ...interface{}) []byte {
 
 	hash := sha3.NewLegacyKeccak256()
 	bs := concatByteSlices(b...)
-
 	hash.Write(bs)
 	return hash.Sum(nil)
 }
@@ -924,16 +922,10 @@ func pack(typ string, value interface{}, _isArray bool) []byte {
 			panic(err)
 		}
 
-		_ = size
-
 		strSize := strconv.Itoa(size)
 		if strSize != match[1] || size == 0 || size > 32 {
 			panic("invalid number type " + typ)
 		}
-
-		//if (bytes_1.arrayify(value).byteLength !== size) {
-		//throw new Error('invalid value for ' + type);
-		//}
 
 		if _isArray {
 			s := reflect.ValueOf(value)
@@ -967,7 +959,25 @@ func pack(typ string, value interface{}, _isArray bool) []byte {
 		z := make([]byte, size)
 		b := make([]byte, s.Len())
 		for i := 0; i < s.Len(); i++ {
-			b[i] = s.Index(i).Interface().(byte)
+			ifc := s.Index(i).Interface()
+			v, ok := ifc.(byte)
+			if ok {
+				b[i] = v
+			} else {
+				v, ok := ifc.(string)
+				if ok {
+					v = strings.TrimPrefix(v, "0x")
+					if len(v)%2 == 1 {
+						v = "0" + v
+					}
+					decoded, err := hex.DecodeString(v)
+					if err != nil {
+						panic(err)
+					}
+					b[i] = decoded[0]
+				}
+			}
+
 		}
 		copy(z[:], b[:])
 		return z
@@ -1019,10 +1029,6 @@ func Pack(types []string, values []interface{}) []byte {
 	}
 
 	return concatByteSlices(tight...)
-}
-
-func keccak256(types []string, values []interface{}) {
-	//return keccak256_1.keccak256(pack(types, values))
 }
 
 func isHex(str string) bool {

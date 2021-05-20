@@ -2,7 +2,6 @@ builds:
   - main: ./cmd/solsha3/main.go
     goos:
       - windows
-      - darwin
       - linux
     goarch:
       - 386
